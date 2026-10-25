@@ -1,5 +1,4 @@
-
-name: ShopEase CI Pipeline - LAB 3
+name: ShopEase CI Pipeline -Lab 3 (updated) 
 
 on:
   push:
@@ -25,9 +24,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Download repository code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Configure Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -37,26 +38,31 @@ jobs:
             requirements.txt
             requirements-dev.txt
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install -r requirements-dev.txt
 
+      # Step 4: Verify Python environment
       - name: Verify Python environment
         run: |
           python --version
           python -m pip --version
 
+      # Step 5: Run application tests
       - name: Run tests
         run: |
           python -m pytest -v test_app.py
 
+      # Step 6: Validate Dockerfile
       - name: Validate Dockerfile
         run: |
           test -s Dockerfile
           echo "Dockerfile exists and is not empty."
 
+      # Step 7: Generate workflow summary
       - name: Create CI summary
         if: always()
         env:
@@ -67,13 +73,16 @@ jobs:
           COMMIT: ${{ github.sha }}
           JOB_STATUS: ${{ job.status }}
         run: |
-          echo "## ShopEase CI Pipeline" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Property | Value |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Repository | $REPOSITORY |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Trigger | $EVENT |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Branch | $BRANCH |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Commit | $COMMIT |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Started by | $ACTOR |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Job status | $JOB_STATUS |" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## ShopEase CI Pipeline"
+            echo ""
+            echo "| Property | Value |"
+            echo "|---|---|"
+            echo "| Repository | ${REPOSITORY} |"
+            echo "| Trigger | ${EVENT} |"
+            echo "| Branch | ${BRANCH} |"
+            echo "| Commit | ${COMMIT} |"
+            echo "| Started by | ${ACTOR} |"
+            echo "| Job status | ${JOB_STATUS} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
